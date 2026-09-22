@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مَصروفِي - لوحة تتبع المصاريف الذكية</title>
+    <!-- مكتبة الأيقونات Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- مكتبة الرسوم البيانية Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" href="Screenshot 2026-09-22 130603.png" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body data-theme="dark">
+
+    <!-- القائمة الجانبية -->
+    <aside>
+        <div class="brand">
+            <i class="fa-solid fa-wallet"></i>
+            <span data-i18n="appName">مَصروفِي</span>
+        </div>
+        <ul class="menu">
+            <li class="active" id="navHome"><a href="#" onclick="switchTab('home')"><i
+                        class="fa-solid fa-house"></i><span data-i18n="home">الرئيسية</span></a></li>
+            <li id="navReports"><a href="#" onclick="switchTab('reports')"><i class="fa-solid fa-chart-pie"></i><span
+                        data-i18n="reports">التقارير والتحليل</span></a></li>
+            <li id="navSettings"><a href="#" onclick="switchTab('settings')"><i class="fa-solid fa-gear"></i><span
+                        data-i18n="settings">الإعدادات</span></a></li>
+        </ul>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="main-content">
+        <!-- الشريط العلوي -->
+        <header>
+            <div class="header-user">
+                <h2 id="welcomeText">مرحباً بك، شعبان</h2>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="settingsQuickBtn" title="الإعدادات" onclick="switchTab('settings')">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+                <button class="icon-btn" id="themeToggleBtn" title="تغيير الوضع">
+                    <i class="fa-solid fa-sun" id="themeIcon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- جسم لوحة التحكم -->
+        <div class="dashboard-body">
+
+            <!-- تبويب الرئيسية -->
+            <div id="tabHome" class="tab-page active-tab">
+                <!-- بطاقات الملخص المالي -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-purple"><i class="fa-solid fa-receipt"></i></div>
+                        <div class="stat-info">
+                            <h3 data-i18n="txCount">عدد المعاملات</h3>
+                            <span id="txCountVal">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-blue"><i class="fa-solid fa-wallet"></i></div>
+                        <div class="stat-info">
+                            <h3 data-i18n="totalBalance">إجمالي الرصيد</h3>
+                            <span id="totalBalanceVal">$0.00</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-green"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                        <div class="stat-info">
+                            <h3 data-i18n="totalIncome">إجمالي الدخل</h3>
+                            <span id="totalIncomeVal" style="color: #10b981;">+$0.00</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-red"><i class="fa-solid fa-arrow-trend-down"></i></div>
+                        <div class="stat-info">
+                            <h3 data-i18n="totalExpense">إجمالي المصاريف</h3>
+                            <span id="totalExpenseVal" style="color: #ef4444;">-$0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- نموذج إضافة معاملة جديدة -->
+                <div class="card-box form-card">
+                    <h3 data-i18n="addTransactionTitle">إضافة معاملة جديدة</h3>
+                    <form id="transactionForm">
+                        <input type="hidden" id="editIndex" value="-1">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label data-i18n="description">الوصف</label>
+                                <input type="text" id="descInput" placeholder="وصف المعاملة..." required
+                                    data-i18n-placeholder="descPlaceholder">
+                            </div>
+                            <div class="form-group">
+                                <label data-i18n="amount">المبلغ</label>
+                                <input type="number" id="amountInput" placeholder="0.00" step="0.01" min="0.01"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label data-i18n="type">النوع</label>
+                                <select id="typeInput" onchange="updateCategoryOptions()">
+                                    <option value="expense" data-i18n="expense">مصروف (-)</option>
+                                    <option value="income" data-i18n="income">دخل (+)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label data-i18n="category">التصنيف</label>
+                                <select id="categoryInput">
+                                    <!-- يتم التحديث ديناميكياً -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label data-i18n="date">التاريخ</label>
+                                <input type="date" id="dateInput" required>
+                            </div>
+                            <div class="form-group form-btn-group">
+                                <button type="submit" id="submitBtn" class="btn-primary" data-i18n="add">إضافة</button>
+                                <button type="button" id="cancelEditBtn" class="btn-secondary" style="display:none;"
+                                    onclick="resetForm()" data-i18n="cancel">إلغاء</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- قسم المعاملات والرسوم البيانية -->
+                <div class="bottom-grid">
+                    <!-- سجل المعاملات -->
+                    <div class="card-box">
+                        <div class="table-header-flex">
+                            <h3 data-i18n="historyTitle">سجل المعاملات</h3>
+                            <div class="filter-controls">
+                                <input type="text" id="searchInput" placeholder="بحث بالوصف..."
+                                    oninput="updateDashboard()" data-i18n-placeholder="searchPlaceholder">
+                                <select id="filterType" onchange="updateDashboard()">
+                                    <option value="all" data-i18n="filterAll">الكل</option>
+                                    <option value="income" data-i18n="incomeOpt">دخل</option>
+                                    <option value="expense" data-i18n="expenseOpt">مصروف</option>
+                                </select>
+                                <select id="sortBy" onchange="updateDashboard()">
+                                    <option value="newest" data-i18n="sortNewest">الأحدث</option>
+                                    <option value="oldest" data-i18n="sortOldest">الأقدم</option>
+                                    <option value="highest" data-i18n="sortHighest">الأعلى مبلغاً</option>
+                                    <option value="lowest" data-i18n="sortLowest">الأقل مبلغاً</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th data-i18n="thDesc">الوصف</th>
+                                        <th data-i18n="thCategory">التصنيف</th>
+                                        <th data-i18n="thDate">التاريخ</th>
+                                        <th data-i18n="thAmount">المبلغ</th>
+                                        <th data-i18n="thType">النوع</th>
+                                        <th data-i18n="thActions">إجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="transactionList">
+                                    <!-- البيانات هنا -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- الرسم البياني وتحليل المصاريف -->
+                    <div class="card-box">
+                        <h3 data-i18n="chartTitle">المصاريف حسب التصنيف</h3>
+                        <div class="chart-container">
+                            <canvas id="myChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- تبويب التقارير والتحليل -->
+            <div id="tabReports" class="tab-page" style="display:none;">
+                <div class="card-box" style="margin-bottom: 24px;">
+                    <h3 data-i18n="salaryAnalysisTitle">تحليل الراتب والميزانية الشهرية</h3>
+                    <div class="salary-analysis-grid">
+                        <div class="stat-card salary-input-card">
+                            <div class="stat-icon bg-blue"><i class="fa-solid fa-money-check-dollar"></i></div>
+                            <div class="stat-info" style="width: 100%;">
+                                <h3 data-i18n="monthlySalaryInput">الراتب الشهري</h3>
+                                <div style="display: flex; gap: 8px; margin-top: 6px;">
+                                    <input type="number" id="quickSalaryInput" placeholder="أدخل الراتب..." step="0.01"
+                                        min="0" oninput="updateSalaryDirectly(this.value)"
+                                        style="width: 100%; padding: 6px 10px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-color);">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon bg-red"><i class="fa-solid fa-percent"></i></div>
+                            <div class="stat-info">
+                                <h3 data-i18n="spentFromSalaryLabel">نسبة المصاريف من الراتب</h3>
+                                <span id="reportSpentRatioVal">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-box" style="margin-bottom: 24px;">
+                    <h3 data-i18n="detailedExpenseAnalysis">تحليل تفصيلي للمصاريف حسب الفئات</h3>
+                    <div id="expenseBreakdownContainer" class="breakdown-list">
+                        <!-- تفاصيل النسب المئوية والفئات -->
+                    </div>
+                </div>
+
+                <div class="card-box">
+                    <h3 data-i18n="reportsSummary">تصدير واستيراد البيانات (JSON)</h3>
+                    <p style="margin-bottom: 20px; color: var(--text-muted);" data-i18n="reportsDesc">يمكنك حفظ نسخة
+                        احتياطية آمنة لكافة معاملاتك واستعادتها في أي وقت، أو مسح البيانات نهائياً.</p>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+                        <button class="btn-primary" onclick="exportJSON()"><i class="fa-solid fa-file-arrow-down"></i>
+                            <span data-i18n="exportJSON">تصدير النسخة الاحتياطية</span></button>
+                        <label class="btn-secondary"
+                            style="cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-file-arrow-up"></i> <span data-i18n="importJSON">استيراد النسخة
+                                الاحتياطية</span>
+                            <input type="file" id="importFile" accept=".json" onchange="importJSON(event)"
+                                style="display: none;">
+                        </label>
+                        <button class="btn-secondary text-red" onclick="clearAllData()"><i
+                                class="fa-solid fa-trash"></i> <span data-i18n="clearData">مسح كافة
+                                البيانات</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- تبويب الإعدادات -->
+            <div id="tabSettings" class="tab-page" style="display:none;">
+                <div class="card-box">
+                    <h3 data-i18n="settingsTitle">إعدادات التطبيق</h3>
+                    <div class="settings-grid">
+                        <div class="form-group">
+                            <label data-i18n="userName">اسم المستخدم</label>
+                            <input type="text" id="settingUserName" value="شعبان">
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="monthlySalaryInput">الراتب الشهري</label>
+                            <input type="number" id="settingSalary" placeholder="0.00" step="0.01" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="currency">العملة</label>
+                            <select id="settingCurrency">
+                                <option value="$" data-i18n="currUSD">دولار أمريكي ($)</option>
+                                <option value="€" data-i18n="currEUR">يورو (€)</option>
+                                <option value="₪" data-i18n="currILS">شيكل (₪)</option>
+                                <option value="EGP" data-i18n="currEGP">جنيه مصري (EGP)</option>
+                                <option value="SAR" data-i18n="currSAR">ريال سعودي (SAR)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="language">اللغة</label>
+                            <select id="settingLang">
+                                <option value="ar">العربية (Arabic)</option>
+                                <option value="en">English (الإنجليزية)</option>
+                            </select>
+                        </div>
+                        <div class="form-group form-btn-group" style="align-self: flex-end;">
+                            <button type="button" class="btn-primary" onclick="saveSettings()"
+                                data-i18n="saveSettings">حفظ الإعدادات</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+
+</html>
