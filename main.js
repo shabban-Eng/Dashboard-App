@@ -1,7 +1,7 @@
-// كلمة المرور الخاصة بك (يمكنك تغييرها لأي رقم تريده)
-const MY_SECRET_PIN = "1234";
+// =========================================================
+// مَصروفِي - لوحة تتبع المصاريف (الوضع المحلي الفوري بدون تسجيل دخول)
+// =========================================================
 
-// القواميس الشاملة للغتين
 const translations = {
   ar: {
     appName: "مَصروفِي",
@@ -45,12 +45,13 @@ const translations = {
     spentFromSalaryLabel: "نسبة المصاريف من الراتب",
     detailedExpenseAnalysis: "تحليل تفصيلي للمصاريف حسب الفئات",
     reportsSummary: "تصدير واستيراد البيانات (نسخة احتياطية JSON)",
-    reportsDesc: "يمكنك حفظ نسخة احتياطية آمنة لكافة معاملاتك واستعادتها في أي وقت، أو مسح البيانات نهائياً.",
+    reportsDesc:
+      "يمكنك حفظ نسخة احتياطية آمنة لكافة معاملاتك واستعادتها في أي وقت، أو مسح البيانات نهائياً.",
     exportJSON: "تصدير النسخة الاحتياطية",
     importJSON: "استيراد النسخة الاحتياطية",
     clearData: "مسح كافة البيانات",
     settingsTitle: "إعدادات التطبيق",
-    userName: "اسم المستخدم",
+    userName: "الاسم المعروض",
     monthlySalaryInput: "الراتب الشهري",
     currency: "العملة",
     language: "اللغة",
@@ -65,6 +66,7 @@ const translations = {
     currILS: "شيكل (₪)",
     currEGP: "جنيه مصري (EGP)",
     currSAR: "ريال سعودي (SAR)",
+    emptyState: "لا توجد معاملات بعد. أضف أول معاملة من النموذج أعلاه.",
   },
   en: {
     appName: "Masroufi",
@@ -108,12 +110,13 @@ const translations = {
     spentFromSalaryLabel: "Expenses Ratio from Salary",
     detailedExpenseAnalysis: "Detailed Expense Breakdown by Category",
     reportsSummary: "Export & Backup Data (JSON)",
-    reportsDesc: "Export a safe backup of all your transactions and restore them anytime, or clear data.",
+    reportsDesc:
+      "Export a safe backup of all your transactions and restore them anytime, or clear data.",
     exportJSON: "Export Backup",
     importJSON: "Import Backup",
     clearData: "Clear All Data",
     settingsTitle: "App Settings",
-    userName: "User Name",
+    userName: "Display Name",
     monthlySalaryInput: "Monthly Salary",
     currency: "Currency",
     language: "Language",
@@ -128,49 +131,125 @@ const translations = {
     currILS: "Shekel (₪)",
     currEGP: "Egyptian Pound (EGP)",
     currSAR: "Saudi Riyal (SAR)",
+    emptyState: "No transactions yet. Add your first one above.",
   },
 };
 
 const categoriesConfig = {
   expense: [
-    { key: "food", ar: "طعام وشرب", en: "Food & Drinks", icon: "fa-utensils", color: "#f59e0b" },
-    { key: "shopping", ar: "تسوق", en: "Shopping", icon: "fa-bag-shopping", color: "#ec4899" },
-    { key: "transport", ar: "مواصلات", en: "Transport", icon: "fa-car", color: "#3b82f6" },
-    { key: "bills", ar: "فواتير خدمات", en: "Utilities & Bills", icon: "fa-file-invoice-dollar", color: "#ef4444" },
-    { key: "entertainment", ar: "ترفيه", en: "Entertainment", icon: "fa-gamepad", color: "#8b5cf6" },
-    { key: "other", ar: "أخرى", en: "Other", icon: "fa-ellipsis", color: "#64748b" },
+    {
+      key: "food",
+      ar: "طعام وشرب",
+      en: "Food & Drinks",
+      icon: "fa-utensils",
+      color: "#f59e0b",
+    },
+    {
+      key: "shopping",
+      ar: "تسوق",
+      en: "Shopping",
+      icon: "fa-bag-shopping",
+      color: "#ec4899",
+    },
+    {
+      key: "transport",
+      ar: "مواصلات",
+      en: "Transport",
+      icon: "fa-car",
+      color: "#3b82f6",
+    },
+    {
+      key: "bills",
+      ar: "فواتير خدمات",
+      en: "Utilities & Bills",
+      icon: "fa-file-invoice-dollar",
+      color: "#ef4444",
+    },
+    {
+      key: "entertainment",
+      ar: "ترفيه",
+      en: "Entertainment",
+      icon: "fa-gamepad",
+      color: "#8b5cf6",
+    },
+    {
+      key: "other",
+      ar: "أخرى",
+      en: "Other",
+      icon: "fa-ellipsis",
+      color: "#64748b",
+    },
   ],
   income: [
-    { key: "salary", ar: "راتب", en: "Salary", icon: "fa-money-bill-wave", color: "#10b981" },
-    { key: "freelance", ar: "عمل حر", en: "Freelance", icon: "fa-laptop-code", color: "#06b6d4" },
+    {
+      key: "salary",
+      ar: "راتب",
+      en: "Salary",
+      icon: "fa-money-bill-wave",
+      color: "#10b981",
+    },
+    {
+      key: "freelance",
+      ar: "عمل حر",
+      en: "Freelance",
+      icon: "fa-laptop-code",
+      color: "#06b6d4",
+    },
     { key: "gift", ar: "هدية", en: "Gift", icon: "fa-gift", color: "#f43f5e" },
-    { key: "investment", ar: "استثمار", en: "Investment", icon: "fa-chart-line", color: "#84cc16" },
-    { key: "other_inc", ar: "أخرى", en: "Other", icon: "fa-coins", color: "#64748b" },
+    {
+      key: "investment",
+      ar: "استثمار",
+      en: "Investment",
+      icon: "fa-chart-line",
+      color: "#84cc16",
+    },
+    {
+      key: "other_inc",
+      ar: "أخرى",
+      en: "Other",
+      icon: "fa-coins",
+      color: "#64748b",
+    },
   ],
 };
 
-let appSettings = JSON.parse(localStorage.getItem("masroufi_shabban_settings")) || {
-  userName: "شعبان",
-  monthlySalary: 1000,
-  currency: "₪",
-  lang: "ar",
-  theme: "dark",
-};
+const STORAGE_KEY = "masroufi_single_user_data_v3";
 
-let transactions = JSON.parse(localStorage.getItem("masroufi_shabban_transactions")) || [];
+function defaultData() {
+  return {
+    settings: {
+      userName: "user",
+      monthlySalary: 0,
+      currency: "$",
+      lang: "ar",
+      theme: "dark",
+    },
+    transactions: [],
+  };
+}
 
-// دالة التحقق من كلمة المرور عبر واجهة HTML
-window.verifyPin = function () {
-  const pinInput = document.getElementById("pinInput");
-  const pinError = document.getElementById("pinError");
-  
-  if (pinInput && pinInput.value === MY_SECRET_PIN) {
-    document.getElementById("authModal").style.display = "none";
-    applySettings();
-  } else {
-    if (pinError) pinError.style.display = "block";
+let appData = defaultData();
+
+function loadData() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (!raw || typeof raw !== "object") return defaultData();
+    return {
+      settings: { ...defaultData().settings, ...(raw.settings || {}) },
+      transactions: Array.isArray(raw.transactions) ? raw.transactions : [],
+    };
+  } catch {
+    return defaultData();
   }
-};
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+}
+
+appData = loadData();
+let appSettings = appData.settings;
+let transactions = appData.transactions;
 
 const body = document.body;
 const themeToggleBtn = document.getElementById("themeToggleBtn");
@@ -179,19 +258,20 @@ const dateInput = document.getElementById("dateInput");
 const typeInput = document.getElementById("typeInput");
 const categoryInput = document.getElementById("categoryInput");
 
-if (dateInput) {
-  dateInput.value = new Date().toISOString().split("T")[0];
-}
-
 let myChart = null;
-const ctxElement = document.getElementById("myChart");
-if (ctxElement) {
+
+function initChartIfNeeded() {
+  if (myChart) return;
+  const ctxElement = document.getElementById("myChart");
+  if (!ctxElement) return;
   const ctx = ctxElement.getContext("2d");
   myChart = new Chart(ctx, {
     type: "bar",
     data: {
       labels: [],
-      datasets: [{ label: "Amount", data: [], backgroundColor: [], borderRadius: 6 }],
+      datasets: [
+        { label: "Amount", data: [], backgroundColor: [], borderRadius: 6 },
+      ],
     },
     options: {
       indexAxis: "y",
@@ -199,16 +279,31 @@ if (ctxElement) {
       maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        x: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { color: "#9ca3af" } },
+        x: {
+          grid: { color: "rgba(255,255,255,0.05)" },
+          ticks: { color: "#9ca3af" },
+        },
         y: { grid: { display: false }, ticks: { color: "#9ca3af" } },
       },
     },
   });
 }
 
+window.addEventListener("DOMContentLoaded", () => {
+  initChartIfNeeded();
+  if (dateInput) dateInput.value = new Date().toISOString().split("T")[0];
+  resetForm();
+  applySettings();
+  switchTab("home");
+});
+
 window.switchTab = function (tabName) {
-  document.querySelectorAll(".tab-page").forEach((el) => (el.style.display = "none"));
-  document.querySelectorAll(".menu li").forEach((el) => el.classList.remove("active"));
+  document
+    .querySelectorAll(".tab-page")
+    .forEach((el) => (el.style.display = "none"));
+  document
+    .querySelectorAll(".menu li")
+    .forEach((el) => el.classList.remove("active"));
 
   if (tabName === "home") {
     document.getElementById("tabHome").style.display = "block";
@@ -243,7 +338,8 @@ window.updateCategoryOptions = function () {
 function applySettings() {
   body.setAttribute("data-theme", appSettings.theme);
   if (themeIcon) {
-    themeIcon.className = appSettings.theme === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+    themeIcon.className =
+      appSettings.theme === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
   }
 
   const lang = appSettings.lang;
@@ -286,14 +382,14 @@ function applySettings() {
 if (themeToggleBtn) {
   themeToggleBtn.addEventListener("click", () => {
     appSettings.theme = appSettings.theme === "dark" ? "light" : "dark";
-    localStorage.setItem("masroufi_shabban_settings", JSON.stringify(appSettings));
+    saveData();
     applySettings();
   });
 }
 
 window.updateSalaryDirectly = function (val) {
   appSettings.monthlySalary = parseFloat(val) || 0;
-  localStorage.setItem("masroufi_shabban_settings", JSON.stringify(appSettings));
+  saveData();
   const setSalary = document.getElementById("settingSalary");
   if (setSalary) setSalary.value = appSettings.monthlySalary;
   updateReportsAnalytics();
@@ -312,8 +408,11 @@ function getCategoryDetails(type, key) {
 
 window.updateDashboard = function () {
   const transactionList = document.getElementById("transactionList");
+  const emptyState = document.getElementById("emptyState");
   if (!transactionList) return;
   transactionList.innerHTML = "";
+
+  if (emptyState) emptyState.hidden = transactions.length !== 0;
 
   let incomeSum = 0;
   let expenseSum = 0;
@@ -329,7 +428,9 @@ window.updateDashboard = function () {
 
   let filtered = transactions.filter((t) => {
     const catDetails = getCategoryDetails(t.type, t.categoryKey);
-    const matchSearch = t.desc.toLowerCase().includes(search) || catDetails.name.toLowerCase().includes(search);
+    const matchSearch =
+      t.desc.toLowerCase().includes(search) ||
+      catDetails.name.toLowerCase().includes(search);
     const matchType = filter === "all" || t.type === filter;
     return matchSearch && matchType;
   });
@@ -339,6 +440,7 @@ window.updateDashboard = function () {
     if (sort === "oldest") return new Date(a.date) - new Date(b.date);
     if (sort === "highest") return b.amount - a.amount;
     if (sort === "lowest") return a.amount - b.amount;
+    return 0;
   });
 
   transactions.forEach((t) => {
@@ -348,9 +450,8 @@ window.updateDashboard = function () {
       incomeSum += amt;
     } else {
       expenseSum += amt;
-      if (!expenseCategoryTotals[catDetails.name]) {
+      if (!expenseCategoryTotals[catDetails.name])
         expenseCategoryTotals[catDetails.name] = 0;
-      }
       expenseCategoryTotals[catDetails.name] += amt;
     }
   });
@@ -367,10 +468,12 @@ window.updateDashboard = function () {
     const colorClass = isIncome ? "text-green" : "text-red";
     const badgeClass = isIncome ? "badge-income" : "badge-expense";
     const formattedDate = formatDateString(item.date);
-    const typeLabel = isIncome ? translations[lang].incomeOpt : translations[lang].expenseOpt;
+    const typeLabel = isIncome
+      ? translations[lang].incomeOpt
+      : translations[lang].expenseOpt;
 
     tr.innerHTML = `
-            <td><strong>${item.desc}</strong></td>
+            <td><strong>${escapeHtml(item.desc)}</strong></td>
             <td><span class="category-tag"><i class="fa-solid ${catDetails.icon}" style="color: ${catDetails.color};"></i> ${catDetails.name}</span></td>
             <td class="date-cell">${formattedDate}</td>
             <td class="${colorClass}">${sign}${appSettings.currency}${item.amount.toFixed(2)}</td>
@@ -389,15 +492,20 @@ window.updateDashboard = function () {
   const totalExpenseVal = document.getElementById("totalExpenseVal");
 
   if (txCountVal) txCountVal.textContent = transactions.length;
-  if (totalBalanceVal) totalBalanceVal.textContent = `${appSettings.currency}${(incomeSum - expenseSum).toFixed(2)}`;
-  if (totalIncomeVal) totalIncomeVal.textContent = `+${appSettings.currency}${incomeSum.toFixed(2)}`;
-  if (totalExpenseVal) totalExpenseVal.textContent = `-${appSettings.currency}${expenseSum.toFixed(2)}`;
+  if (totalBalanceVal)
+    totalBalanceVal.textContent = `${appSettings.currency}${(incomeSum - expenseSum).toFixed(2)}`;
+  if (totalIncomeVal)
+    totalIncomeVal.textContent = `+${appSettings.currency}${incomeSum.toFixed(2)}`;
+  if (totalExpenseVal)
+    totalExpenseVal.textContent = `-${appSettings.currency}${expenseSum.toFixed(2)}`;
 
   if (myChart) {
     const catNames = Object.keys(expenseCategoryTotals);
     const catAmounts = Object.values(expenseCategoryTotals);
     const colors = catNames.map((name) => {
-      const found = categoriesConfig["expense"].find((c) => c.ar === name || c.en === name);
+      const found = categoriesConfig["expense"].find(
+        (c) => c.ar === name || c.en === name,
+      );
       return found ? found.color : "#6366f1";
     });
 
@@ -407,8 +515,14 @@ window.updateDashboard = function () {
     myChart.update();
   }
 
-  localStorage.setItem("masroufi_shabban_transactions", JSON.stringify(transactions));
+  saveData();
 };
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
 
 function updateReportsAnalytics() {
   let totalExpense = 0;
@@ -430,12 +544,15 @@ function updateReportsAnalytics() {
   const salary = parseFloat(appSettings.monthlySalary) || 0;
   const reportSpentRatioVal = document.getElementById("reportSpentRatioVal");
   let spentRatio = salary > 0 ? (totalExpense / salary) * 100 : 0;
-  if (reportSpentRatioVal) reportSpentRatioVal.textContent = `${spentRatio.toFixed(1)}%`;
+  if (reportSpentRatioVal)
+    reportSpentRatioVal.textContent = `${spentRatio.toFixed(1)}%`;
 
   const quickSalary = document.getElementById("quickSalaryInput");
   if (quickSalary && quickSalary.value != salary) quickSalary.value = salary;
 
-  const breakdownContainer = document.getElementById("expenseBreakdownContainer");
+  const breakdownContainer = document.getElementById(
+    "expenseBreakdownContainer",
+  );
   if (breakdownContainer) {
     breakdownContainer.innerHTML = "";
     if (Object.keys(expenseCategoryTotals).length === 0) {
@@ -444,7 +561,8 @@ function updateReportsAnalytics() {
     }
 
     for (const [catName, data] of Object.entries(expenseCategoryTotals)) {
-      const percentage = totalExpense > 0 ? (data.amount / totalExpense) * 100 : 0;
+      const percentage =
+        totalExpense > 0 ? (data.amount / totalExpense) * 100 : 0;
       const itemEl = document.createElement("div");
       itemEl.className = "breakdown-item";
       itemEl.innerHTML = `
@@ -467,10 +585,39 @@ function formatDateString(dateStr) {
   if (isNaN(d.getTime())) return dateStr;
   const lang = appSettings.lang;
   if (lang === "en") {
-    return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+    return d.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   }
-  const months = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+  const months = [
+    "يناير",
+    "فبراير",
+    "مارس",
+    "أبريل",
+    "مايو",
+    "يونيو",
+    "يوليو",
+    "أغسطس",
+    "سبتمبر",
+    "أكتوبر",
+    "نوفمبر",
+    "ديسمبر",
+  ];
   return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function setFormError(message) {
+  const formError = document.getElementById("formError");
+  if (!formError) return;
+  if (!message) {
+    formError.hidden = true;
+    formError.textContent = "";
+    return;
+  }
+  formError.hidden = false;
+  formError.textContent = message;
 }
 
 const transactionForm = document.getElementById("transactionForm");
@@ -484,12 +631,49 @@ if (transactionForm) {
     const categoryInputEl = document.getElementById("categoryInput");
     const dateInputEl = document.getElementById("dateInput");
 
-    if (!editIndexInput || !descInput || !amountInput || !typeInputEl || !categoryInputEl || !dateInputEl) return;
+    if (
+      !editIndexInput ||
+      !descInput ||
+      !amountInput ||
+      !typeInputEl ||
+      !categoryInputEl ||
+      !dateInputEl
+    )
+      return;
+
+    const desc = descInput.value.trim();
+    const amount = parseFloat(amountInput.value);
+
+    if (!desc) {
+      setFormError(
+        appSettings.lang === "ar"
+          ? "يرجى إدخال وصف للمعاملة."
+          : "Please enter a description.",
+      );
+      return;
+    }
+    if (isNaN(amount) || amount <= 0) {
+      setFormError(
+        appSettings.lang === "ar"
+          ? "يرجى إدخال مبلغ صحيح أكبر من صفر."
+          : "Please enter a valid amount greater than zero.",
+      );
+      return;
+    }
+    if (!dateInputEl.value) {
+      setFormError(
+        appSettings.lang === "ar"
+          ? "يرجى اختيار تاريخ."
+          : "Please choose a date.",
+      );
+      return;
+    }
+    setFormError(null);
 
     const editIdx = parseInt(editIndexInput.value);
     const newTx = {
-      desc: descInput.value,
-      amount: parseFloat(amountInput.value),
+      desc,
+      amount,
       type: typeInputEl.value,
       categoryKey: categoryInputEl.value,
       date: dateInputEl.value,
@@ -501,13 +685,14 @@ if (transactionForm) {
       transactions[editIdx] = newTx;
     }
 
-    window.resetForm();
-    window.updateDashboard();
+    resetForm();
+    updateDashboard();
   });
 }
 
 window.editTransaction = function (index) {
   const item = transactions[index];
+  if (!item) return;
   const editIndexInput = document.getElementById("editIndex");
   const descInput = document.getElementById("descInput");
   const amountInput = document.getElementById("amountInput");
@@ -517,26 +702,30 @@ window.editTransaction = function (index) {
   const submitBtn = document.getElementById("submitBtn");
   const cancelEditBtn = document.getElementById("cancelEditBtn");
 
-  if (!editIndexInput || !descInput || !amountInput || !typeInputEl || !categoryInputEl || !dateInputEl) return;
+  if (
+    !editIndexInput ||
+    !descInput ||
+    !amountInput ||
+    !typeInputEl ||
+    !categoryInputEl ||
+    !dateInputEl
+  )
+    return;
 
   editIndexInput.value = index;
   descInput.value = item.desc;
   amountInput.value = item.amount;
   typeInputEl.value = item.type;
-  window.updateCategoryOptions();
+  updateCategoryOptions();
   categoryInputEl.value = item.categoryKey;
   dateInputEl.value = item.date;
 
   const t = translations[appSettings.lang];
   if (submitBtn) submitBtn.textContent = t.update;
   if (cancelEditBtn) cancelEditBtn.style.display = "inline-block";
+  setFormError(null);
 
-  const mainContainer = document.querySelector(".main-content");
-  if (mainContainer) {
-    mainContainer.scrollTo({ top: 0, behavior: "smooth" });
-  } else {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
+  window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 window.resetForm = function () {
@@ -548,7 +737,8 @@ window.resetForm = function () {
   if (editIndexInput) editIndexInput.value = "-1";
   if (transactionFormEl) transactionFormEl.reset();
   if (dateInput) dateInput.value = new Date().toISOString().split("T")[0];
-  window.updateCategoryOptions();
+  updateCategoryOptions();
+  setFormError(null);
 
   const t = translations[appSettings.lang];
   if (submitBtn) submitBtn.textContent = t.add;
@@ -557,10 +747,13 @@ window.resetForm = function () {
 
 window.deleteTransaction = function (index) {
   const lang = appSettings.lang;
-  const msg = lang === "ar" ? "هل أنت متأكد من حذف هذه المعاملة؟" : "Are you sure you want to delete this transaction?";
+  const msg =
+    lang === "ar"
+      ? "هل أنت متأكد من حذف هذه المعاملة؟"
+      : "Are you sure you want to delete this transaction?";
   if (confirm(msg)) {
     transactions.splice(index, 1);
-    window.updateDashboard();
+    updateDashboard();
   }
 };
 
@@ -570,28 +763,35 @@ window.saveSettings = function () {
   const setCurr = document.getElementById("settingCurrency");
   const setLang = document.getElementById("settingLang");
 
-  if (setUserName) appSettings.userName = setUserName.value;
+  if (setUserName && setUserName.value.trim())
+    appSettings.userName = setUserName.value.trim();
   if (setSalary) appSettings.monthlySalary = parseFloat(setSalary.value) || 0;
   if (setCurr) appSettings.currency = setCurr.value;
   if (setLang) appSettings.lang = setLang.value;
 
-  localStorage.setItem("masroufi_shabban_settings", JSON.stringify(appSettings));
+  saveData();
   applySettings();
   alert(translations[appSettings.lang].savedSuccess);
 };
 
 window.exportJSON = function () {
   if (transactions.length === 0)
-    return alert(appSettings.lang === "ar" ? "لا توجد بيانات للتصدير!" : "No data to export!");
+    return alert(
+      appSettings.lang === "ar"
+        ? "لا توجد بيانات للتصدير!"
+        : "No data to export!",
+    );
   const backupData = {
     settings: appSettings,
     transactions: transactions,
     exportDate: new Date().toISOString(),
   };
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+  const dataStr =
+    "data:text/json;charset=utf-8," +
+    encodeURIComponent(JSON.stringify(backupData, null, 2));
   const downloadAnchor = document.createElement("a");
   downloadAnchor.setAttribute("href", dataStr);
-  downloadAnchor.setAttribute("download", "masroufi_backup.json");
+  downloadAnchor.setAttribute("download", `masroufi_backup.json`);
   document.body.appendChild(downloadAnchor);
   downloadAnchor.click();
   downloadAnchor.remove();
@@ -607,25 +807,40 @@ window.importJSON = function (event) {
         if (parsed.transactions && Array.isArray(parsed.transactions)) {
           transactions = parsed.transactions;
           if (parsed.settings) {
-            appSettings = parsed.settings;
-            localStorage.setItem("masroufi_shabban_settings", JSON.stringify(appSettings));
+            appSettings = { ...appSettings, ...parsed.settings };
           }
+          saveData();
           applySettings();
-          alert(appSettings.lang === "ar" ? "تم استعادة البيانات بنجاح!" : "Data successfully imported!");
+          alert(
+            appSettings.lang === "ar"
+              ? "تم استعادة البيانات بنجاح!"
+              : "Data successfully imported!",
+          );
         } else {
-          alert(appSettings.lang === "ar" ? "ملف النسخة الاحتياطية غير صالح!" : "Invalid backup file!");
+          alert(
+            appSettings.lang === "ar"
+              ? "ملف النسخة الاحتياطية غير صالح!"
+              : "Invalid backup file!",
+          );
         }
       } catch (error) {
-        alert(appSettings.lang === "ar" ? "حدث خطأ أثناء قراءة الملف!" : "Error reading file!");
+        alert(
+          appSettings.lang === "ar"
+            ? "حدث خطأ أثناء قراءة الملف!"
+            : "Error reading file!",
+        );
       }
     };
   }
 };
 
 window.clearAllData = function () {
-  const msg = appSettings.lang === "ar" ? "تحذير: سيتم حذف كافة البيانات المسجلة بالكامل!" : "Warning: All recorded data will be permanently deleted!";
+  const msg =
+    appSettings.lang === "ar"
+      ? "تحذير: سيتم حذف كافة البيانات المسجلة بالكامل!"
+      : "Warning: All recorded data will be permanently deleted!";
   if (confirm(msg)) {
     transactions = [];
-    window.updateDashboard();
+    updateDashboard();
   }
 };
