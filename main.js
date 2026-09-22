@@ -1,5 +1,5 @@
 // =========================================================
-// مَصروفِي - لوحة تتبع المصاريف (الوضع المحلي الفوري بدون تسجيل دخول)
+// مَصروفِي - لوحة تتبع المصاريف (حفظ محلي فوري وثابت)
 // =========================================================
 
 const translations = {
@@ -213,43 +213,65 @@ const categoriesConfig = {
   ],
 };
 
-const STORAGE_KEY = "masroufi_single_user_data_v3";
-
-function defaultData() {
-  return {
-    settings: {
-      userName: "user",
-      monthlySalary: 0,
-      currency: "$",
-      lang: "ar",
-      theme: "dark",
-    },
-    transactions: [],
-  };
-}
-
-let appData = defaultData();
+const STORAGE_KEY = "masroufi_single_user_data_v4";
 
 function loadData() {
   try {
-    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (!raw || typeof raw !== "object") return defaultData();
+    const rawData = localStorage.getItem(STORAGE_KEY);
+    if (!rawData) {
+      return {
+        settings: {
+          userName: "user",
+          monthlySalary: 0,
+          currency: "$",
+          lang: "ar",
+          theme: "dark",
+        },
+        transactions: [],
+      };
+    }
+    const parsed = JSON.parse(rawData);
     return {
-      settings: { ...defaultData().settings, ...(raw.settings || {}) },
-      transactions: Array.isArray(raw.transactions) ? raw.transactions : [],
+      settings: {
+        userName: parsed.settings?.userName || "user",
+        monthlySalary: parsed.settings?.monthlySalary || 0,
+        currency: parsed.settings?.currency || "$",
+        lang: parsed.settings?.lang || "ar",
+        theme: parsed.settings?.theme || "dark",
+      },
+      transactions: Array.isArray(parsed.transactions)
+        ? parsed.transactions
+        : [],
     };
-  } catch {
-    return defaultData();
+  } catch (e) {
+    return {
+      settings: {
+        userName: "user",
+        monthlySalary: 0,
+        currency: "$",
+        lang: "ar",
+        theme: "dark",
+      },
+      transactions: [],
+    };
   }
 }
 
-function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-}
-
-appData = loadData();
+let appData = loadData();
 let appSettings = appData.settings;
 let transactions = appData.transactions;
+
+function saveData() {
+  try {
+    const dataToSave = {
+      settings: appSettings,
+      transactions: transactions,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+  } catch (e) {
+    console.error("Error saving to localStorage", e);
+  }
+}
 
 const body = document.body;
 const themeToggleBtn = document.getElementById("themeToggleBtn");
@@ -358,10 +380,11 @@ function applySettings() {
   });
 
   const welcomeEl = document.getElementById("welcomeText");
-  if (welcomeEl) welcomeEl.textContent = t.welcome + appSettings.userName;
+  if (welcomeEl)
+    welcomeEl.textContent = t.welcome + (appSettings.userName || "user");
 
   const setUserName = document.getElementById("settingUserName");
-  if (setUserName) setUserName.value = appSettings.userName;
+  if (setUserName) setUserName.value = appSettings.userName || "user";
 
   const setSalary = document.getElementById("settingSalary");
   if (setSalary) setSalary.value = appSettings.monthlySalary;
@@ -515,6 +538,7 @@ window.updateDashboard = function () {
     myChart.update();
   }
 
+  // الحفظ الفوري عند كل تحديث للبيانات
   saveData();
 };
 
