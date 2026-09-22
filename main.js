@@ -1,4 +1,4 @@
-// القواميس الشاملة للغتين (تم إضافة ترجمات العملات)
+// القواميس الشاملة للغتين
 const translations = {
   ar: {
     appName: "مَصروفِي",
@@ -130,7 +130,6 @@ const translations = {
   },
 };
 
-// التصنيفات مع تخصيص لون مميز لكل تصنيف مصروف
 const categoriesConfig = {
   expense: [
     {
@@ -209,7 +208,6 @@ const categoriesConfig = {
   ],
 };
 
-// حالة التطبيق مع مفتاح فرعي خاص بشعبان
 let appSettings = JSON.parse(
   localStorage.getItem("masroufi_shabban_settings"),
 ) || {
@@ -220,46 +218,22 @@ let appSettings = JSON.parse(
   theme: "dark",
 };
 
-let transactions = JSON.parse(
-  localStorage.getItem("masroufi_shabban_transactions"),
-) || [
-  {
-    desc: "ملوخية",
-    amount: 160,
-    type: "expense",
-    categoryKey: "food",
-    date: "2026-09-22",
-  },
-  {
-    desc: "نت",
-    amount: 60,
-    type: "expense",
-    categoryKey: "bills",
-    date: "2026-09-22",
-  },
-  {
-    desc: "قهوة",
-    amount: 10,
-    type: "expense",
-    categoryKey: "food",
-    date: "2026-09-22",
-  },
-];
+let transactions =
+  JSON.parse(localStorage.getItem("masroufi_shabban_transactions")) || [];
 
-transactions.forEach((t) => {
-  if (!t.categoryKey) {
-    let foundKey = "other";
-    ["expense", "income"].forEach((type) => {
-      categoriesConfig[type].forEach((cat) => {
-        if (cat.ar === t.category || cat.en === t.category) {
-          t.categoryKey = cat.key;
-        }
-      });
-    });
-    if (!t.categoryKey) t.categoryKey = "other";
-    delete t.category;
+// دالة التحقق من كلمة المرور عند فتح التطبيق
+function checkAuth() {
+  const savedPin = localStorage.getItem("masroufi_user_pin") || "1234"; // كلمة المرور الافتراضية يمكنك تغييرها
+  let enteredPin = prompt("الرجاء إدخال رمز الحماية الخاص بفتح التطبيق:");
+
+  if (enteredPin !== savedPin) {
+    alert("كلمة المرور غير صحيحة! سيتم إخفاء البيانات.");
+    transactions = []; // تفريغ البيانات لمنع ظهورها لو فتحها شخص آخر
   }
-});
+}
+
+// تشغيل التحقق فوراً قبل تحميل الصفحة
+checkAuth();
 
 const body = document.body;
 const themeToggleBtn = document.getElementById("themeToggleBtn");
@@ -272,7 +246,6 @@ if (dateInput) {
   dateInput.value = new Date().toISOString().split("T")[0];
 }
 
-// إعداد الرسم البياني Chart.js
 let myChart = null;
 const ctxElement = document.getElementById("myChart");
 if (ctxElement) {
@@ -282,36 +255,25 @@ if (ctxElement) {
     data: {
       labels: [],
       datasets: [
-        {
-          label: "Amount",
-          data: [],
-          backgroundColor: [],
-          borderRadius: 6,
-        },
+        { label: "Amount", data: [], backgroundColor: [], borderRadius: 6 },
       ],
     },
     options: {
       indexAxis: "y",
       responsive: true,
       maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-      },
+      plugins: { legend: { display: false } },
       scales: {
         x: {
           grid: { color: "rgba(255,255,255,0.05)" },
           ticks: { color: "#9ca3af" },
         },
-        y: {
-          grid: { display: false },
-          ticks: { color: "#9ca3af" },
-        },
+        y: { grid: { display: false }, ticks: { color: "#9ca3af" } },
       },
     },
   });
 }
 
-// التبديل بين التبويبات
 window.switchTab = function (tabName) {
   document
     .querySelectorAll(".tab-page")
@@ -520,7 +482,6 @@ window.updateDashboard = function () {
   if (myChart) {
     const catNames = Object.keys(expenseCategoryTotals);
     const catAmounts = Object.values(expenseCategoryTotals);
-
     const colors = catNames.map((name) => {
       const found = categoriesConfig["expense"].find(
         (c) => c.ar === name || c.en === name,
@@ -559,7 +520,6 @@ function updateReportsAnalytics() {
 
   const salary = parseFloat(appSettings.monthlySalary) || 0;
   const reportSpentRatioVal = document.getElementById("reportSpentRatioVal");
-
   let spentRatio = salary > 0 ? (totalExpense / salary) * 100 : 0;
   if (reportSpentRatioVal)
     reportSpentRatioVal.textContent = `${spentRatio.toFixed(1)}%`;
@@ -580,7 +540,6 @@ function updateReportsAnalytics() {
     for (const [catName, data] of Object.entries(expenseCategoryTotals)) {
       const percentage =
         totalExpense > 0 ? (data.amount / totalExpense) * 100 : 0;
-
       const itemEl = document.createElement("div");
       itemEl.className = "breakdown-item";
       itemEl.innerHTML = `
@@ -630,7 +589,6 @@ const transactionForm = document.getElementById("transactionForm");
 if (transactionForm) {
   transactionForm.addEventListener("submit", (e) => {
     e.preventDefault();
-
     const editIndexInput = document.getElementById("editIndex");
     const descInput = document.getElementById("descInput");
     const amountInput = document.getElementById("amountInput");
