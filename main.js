@@ -209,8 +209,10 @@ const categoriesConfig = {
   ],
 };
 
-// حالة التطبيق
-let appSettings = JSON.parse(localStorage.getItem("appSettings")) || {
+// حالة التطبيق مع مفتاح فرعي خاص بشعبان
+let appSettings = JSON.parse(
+  localStorage.getItem("masroufi_shabban_settings"),
+) || {
   userName: "شعبان",
   monthlySalary: 1000,
   currency: "₪",
@@ -218,7 +220,9 @@ let appSettings = JSON.parse(localStorage.getItem("appSettings")) || {
   theme: "dark",
 };
 
-let transactions = JSON.parse(localStorage.getItem("transactions")) || [
+let transactions = JSON.parse(
+  localStorage.getItem("masroufi_shabban_transactions"),
+) || [
   {
     desc: "ملوخية",
     amount: 160,
@@ -281,7 +285,7 @@ if (ctxElement) {
         {
           label: "Amount",
           data: [],
-          backgroundColor: [], // سيتم تعبئتها بألوان ديناميكية لكل صنف
+          backgroundColor: [],
           borderRadius: 6,
         },
       ],
@@ -393,14 +397,20 @@ function applySettings() {
 if (themeToggleBtn) {
   themeToggleBtn.addEventListener("click", () => {
     appSettings.theme = appSettings.theme === "dark" ? "light" : "dark";
-    localStorage.setItem("appSettings", JSON.stringify(appSettings));
+    localStorage.setItem(
+      "masroufi_shabban_settings",
+      JSON.stringify(appSettings),
+    );
     applySettings();
   });
 }
 
 window.updateSalaryDirectly = function (val) {
   appSettings.monthlySalary = parseFloat(val) || 0;
-  localStorage.setItem("appSettings", JSON.stringify(appSettings));
+  localStorage.setItem(
+    "masroufi_shabban_settings",
+    JSON.stringify(appSettings),
+  );
   const setSalary = document.getElementById("settingSalary");
   if (setSalary) setSalary.value = appSettings.monthlySalary;
   updateReportsAnalytics();
@@ -425,7 +435,6 @@ window.updateDashboard = function () {
   let incomeSum = 0;
   let expenseSum = 0;
   let expenseCategoryTotals = {};
-  let expenseCategoryColors = [];
 
   const searchInput = document.getElementById("searchInput");
   const filterType = document.getElementById("filterType");
@@ -508,12 +517,10 @@ window.updateDashboard = function () {
   if (totalExpenseVal)
     totalExpenseVal.textContent = `-${appSettings.currency}${expenseSum.toFixed(2)}`;
 
-  // تحديث الرسم البياني مع ألوان مميزة ومناسبة لكل تصنيف
   if (myChart) {
     const catNames = Object.keys(expenseCategoryTotals);
     const catAmounts = Object.values(expenseCategoryTotals);
 
-    // جلب اللون المخصص لكل تصنيف من القائمة ليظهر في الرسم البياني
     const colors = catNames.map((name) => {
       const found = categoriesConfig["expense"].find(
         (c) => c.ar === name || c.en === name,
@@ -527,7 +534,10 @@ window.updateDashboard = function () {
     myChart.update();
   }
 
-  localStorage.setItem("transactions", JSON.stringify(transactions));
+  localStorage.setItem(
+    "masroufi_shabban_transactions",
+    JSON.stringify(transactions),
+  );
 };
 
 function updateReportsAnalytics() {
@@ -738,7 +748,10 @@ window.saveSettings = function () {
   if (setCurr) appSettings.currency = setCurr.value;
   if (setLang) appSettings.lang = setLang.value;
 
-  localStorage.setItem("appSettings", JSON.stringify(appSettings));
+  localStorage.setItem(
+    "masroufi_shabban_settings",
+    JSON.stringify(appSettings),
+  );
   applySettings();
   alert(translations[appSettings.lang].savedSuccess);
 };
@@ -777,7 +790,10 @@ window.importJSON = function (event) {
           transactions = parsed.transactions;
           if (parsed.settings) {
             appSettings = parsed.settings;
-            localStorage.setItem("appSettings", JSON.stringify(appSettings));
+            localStorage.setItem(
+              "masroufi_shabban_settings",
+              JSON.stringify(appSettings),
+            );
           }
           applySettings();
           alert(
